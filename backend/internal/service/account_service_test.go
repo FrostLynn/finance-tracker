@@ -42,6 +42,17 @@ func (m *mockAccountRepo) UpdateBalance(ctx context.Context, id uuid.UUID, newBa
 	return nil
 }
 
+func (m *mockAccountRepo) Delete(ctx context.Context, id uuid.UUID) error {
+	var remaining []model.Account
+	for _, acc := range m.accounts {
+		if acc.ID != id {
+			remaining = append(remaining, acc)
+		}
+	}
+	m.accounts = remaining
+	return nil
+}
+
 func TestAccountService_CalculateTotals(t *testing.T) {
 	dueDay := 25
 	accounts := []model.Account{

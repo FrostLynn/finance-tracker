@@ -77,3 +77,9 @@ func (r *PostgresAccountRepository) UpdateBalance(ctx context.Context, id uuid.U
 	_, err := r.pool.Exec(ctx, query, newBalance, id)
 	return err
 }
+
+func (r *PostgresAccountRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	query := `DELETE FROM accounts WHERE id = $1`
+	_, err := r.pool.Exec(ctx, query, id)
+	return err
+}

@@ -13,6 +13,8 @@ type RouterDependencies struct {
 	TransactionHandler *TransactionHandler
 	SummaryHandler     *SummaryHandler
 	CategoryHandler    *CategoryHandler
+	SavingsHandler     *SavingsHandler
+	SystemHandler      *SystemHandler
 }
 
 func NewRouter(deps RouterDependencies) http.Handler {
@@ -43,6 +45,7 @@ func NewRouter(deps RouterDependencies) http.Handler {
 		api.Route("/accounts", func(acc chi.Router) {
 			acc.Get("/", deps.AccountHandler.List)
 			acc.Post("/", deps.AccountHandler.Create)
+			acc.Delete("/{id}", deps.AccountHandler.Delete)
 		})
 
 		// Transactions
@@ -52,11 +55,22 @@ func NewRouter(deps RouterDependencies) http.Handler {
 			tx.Delete("/{id}", deps.TransactionHandler.Delete)
 		})
 
+		// Savings Goals (Nabung)
+		api.Route("/savings", func(sav chi.Router) {
+			sav.Get("/", deps.SavingsHandler.List)
+			sav.Post("/", deps.SavingsHandler.Create)
+			sav.Post("/{id}/deposit", deps.SavingsHandler.Deposit)
+			sav.Delete("/{id}", deps.SavingsHandler.Delete)
+		})
+
 		// Summary
 		api.Get("/summary", deps.SummaryHandler.GetSummary)
 
 		// Categories
 		api.Get("/categories", deps.CategoryHandler.List)
+
+		// System Reset (Hapus Semua Data)
+		api.Post("/system/reset", deps.SystemHandler.ResetAllData)
 	})
 
 	return r

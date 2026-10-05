@@ -72,3 +72,7 @@ func (s *AccountService) CalculateTotals(accounts []model.Account) *model.Accoun
 
 	return totals
 }
+
+func (s *AccountService) DeleteAccount(ctx context.Context, id uuid.UUID) error {
+	return s.repo.Delete(ctx, id)
+}

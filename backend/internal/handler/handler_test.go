@@ -39,6 +39,10 @@ func (d *dummyAccountRepo) UpdateBalance(ctx context.Context, id uuid.UUID, newB
 	return nil
 }
 
+func (d *dummyAccountRepo) Delete(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+
 type dummyTxRepo struct {
 	txs []model.Transaction
 }
@@ -91,6 +95,8 @@ func setupTestRouter() http.Handler {
 		TransactionHandler: handler.NewTransactionHandler(txSvc),
 		SummaryHandler:     handler.NewSummaryHandler(sumSvc),
 		CategoryHandler:    handler.NewCategoryHandler(catRepo),
+		SavingsHandler:     handler.NewSavingsHandler(service.NewSavingsService(nil)),
+		SystemHandler:      handler.NewSystemHandler(nil),
 	})
 }
 

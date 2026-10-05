@@ -6,6 +6,8 @@ import (
 
 	"github.com/akhdan/finance-tracker/backend/internal/model"
 	"github.com/akhdan/finance-tracker/backend/internal/service"
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
 type AccountHandler struct {
@@ -26,6 +28,9 @@ func (h *AccountHandler) List(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, "gagal mengambil daftar akun")
 		return
+	}
+	if accounts == nil {
+		accounts = []model.Account{}
 	}
 
 	respondJSON(w, http.StatusOK, AccountListResponse{
@@ -48,4 +53,20 @@ func (h *AccountHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, http.StatusCreated, acc)
+}
+
+func (h *AccountHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "ID akun tidak valid")
+		return
+	}
+
+	if err := h.svc.DeleteAccount(r.Context(), id); err != nil {
+		respondError(w, http.StatusInternalServerError, "gagal menghapus akun: "+err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]string{"message": "akun berhasil dihapus"})
 }

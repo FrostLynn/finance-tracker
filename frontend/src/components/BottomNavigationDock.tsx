@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type NavTab = 'mutasi' | 'budget' | 'rekap' | 'akun';
+export type NavTab = 'mutasi' | 'nabung' | 'rekap' | 'akun';
 
 interface BottomNavigationDockProps {
   activeTab: NavTab;
@@ -28,16 +28,16 @@ export const BottomNavigationDock: React.FC<BottomNavigationDockProps> = ({
           <span className="text-[10px]">Mutasi</span>
         </button>
 
-        {/* Tab 2: Budget */}
+        {/* Tab 2: Nabung */}
         <button
-          onClick={() => onTabChange('budget')}
+          onClick={() => onTabChange('nabung')}
           className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 cursor-pointer ${
-            activeTab === 'budget' ? 'text-ios-blue font-semibold' : 'text-ios-secondary hover:text-white'
+            activeTab === 'nabung' ? 'text-ios-blue font-semibold' : 'text-ios-secondary hover:text-white'
           }`}
-          aria-label="Tab Budget"
+          aria-label="Tab Nabung"
         >
-          <span className="text-lg leading-none">🎯</span>
-          <span className="text-[10px]">Budget</span>
+          <span className="text-lg leading-none">🐷</span>
+          <span className="text-[10px]">Nabung</span>
         </button>
 
         {/* Center 50% Quick Add Action Button */}

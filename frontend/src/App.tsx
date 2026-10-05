@@ -1,5 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
-import type { Account, Category, MonthlySummary, Transaction, CreateTransactionPayload, AccountTotals } from './types/finance';
+import type {
+  Account,
+  Category,
+  MonthlySummary,
+  Transaction,
+  CreateTransactionPayload,
+  AccountTotals,
+  SavingsGoal,
+  CreateSavingsGoalPayload,
+  CreateAccountPayload,
+} from './types/finance';
 import { api } from './services/api';
 import { DynamicIsland } from './components/DynamicIsland';
 import { HeroBalanceCard } from './components/HeroBalanceCard';
@@ -8,9 +18,10 @@ import { PaylaterCard } from './components/PaylaterCard';
 import { TransactionList } from './components/TransactionList';
 import { SummaryView } from './components/SummaryView';
 import { AccountsView } from './components/AccountsView';
-import { BudgetPlaceholder } from './components/BudgetPlaceholder';
+import { SavingsView } from './components/SavingsView';
 import { BottomNavigationDock, type NavTab } from './components/BottomNavigationDock';
 import { QuickAddModal } from './components/QuickAddModal';
+import { AddAccountModal } from './components/AddAccountModal';
 
 export function App() {
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -20,6 +31,7 @@ export function App() {
 
   const [activeTab, setActiveTab] = useState<NavTab>('mutasi');
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+  const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
 
   // Data states
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -27,16 +39,18 @@ export function App() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
+  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const [accRes, catRes, txRes, sumRes] = await Promise.all([
+      const [accRes, catRes, txRes, sumRes, savRes] = await Promise.all([
         api.getAccounts(),
         api.getCategories(),
         api.getTransactions(currentMonth),
         api.getSummary(currentMonth),
+        api.getSavings(),
       ]);
 
       setAccounts(accRes.accounts);
@@ -44,6 +58,7 @@ export function App() {
       setCategories(catRes);
       setTransactions(txRes);
       setSummary(sumRes);
+      setSavingsGoals(savRes);
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {
@@ -55,6 +70,7 @@ export function App() {
     loadData();
   }, [loadData]);
 
+  // Transaction handlers
   const handleCreateTransaction = async (payload: CreateTransactionPayload) => {
     await api.createTransaction(payload);
     await loadData();
@@ -69,11 +85,53 @@ export function App() {
     }
   };
 
+  // Account handlers
+  const handleCreateAccount = async (payload: CreateAccountPayload) => {
+    await api.createAccount(payload);
+    await loadData();
+  };
+
+  const handleDeleteAccount = async (id: string) => {
+    try {
+      await api.deleteAccount(id);
+      await loadData();
+    } catch (err) {
+      alert('Gagal menghapus akun');
+    }
+  };
+
+  // Savings handlers
+  const handleCreateGoal = async (payload: CreateSavingsGoalPayload) => {
+    await api.createSavingsGoal(payload);
+    await loadData();
+  };
+
+  const handleDepositGoal = async (id: string, amount: number) => {
+    await api.depositSavings(id, amount);
+    await loadData();
+  };
+
+  const handleDeleteGoal = async (id: string) => {
+    await api.deleteSavingsGoal(id);
+    await loadData();
+  };
+
+  // Reset all data
+  const handleResetAllData = async () => {
+    try {
+      await api.resetAllData();
+      await loadData();
+      alert('Seluruh data berhasil direset ke 0.');
+    } catch (err) {
+      alert('Gagal mereset data');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-ios-bg text-ios-text flex justify-center selection:bg-ios-blue/30">
       {/* Mobile Frame Container (max-w-[430px]) */}
       <div className="w-full max-w-[430px] min-h-screen flex flex-col relative px-4 pb-28 pt-1">
-        {/* Dynamic Island & Month Navigator */}
+        {/* Modern App Header with Month Selector */}
         <DynamicIsland
           currentMonth={currentMonth}
           onMonthChange={(m) => setCurrentMonth(m)}
@@ -94,7 +152,10 @@ export function App() {
                 <PaylaterCard
                   totalPaylaterDebt={totals ? totals.total_paylater_debt : 0}
                 />
-                <AccountCarousel accounts={accounts} />
+                <AccountCarousel
+                  accounts={accounts}
+                  onAddAccountClick={() => setIsAddAccountOpen(true)}
+                />
                 <TransactionList
                   transactions={transactions}
                   onDelete={handleDeleteTransaction}
@@ -102,12 +163,25 @@ export function App() {
               </>
             )}
 
-            {activeTab === 'budget' && <BudgetPlaceholder />}
+            {activeTab === 'nabung' && (
+              <SavingsView
+                goals={savingsGoals}
+                onCreateGoal={handleCreateGoal}
+                onDeposit={handleDepositGoal}
+                onDeleteGoal={handleDeleteGoal}
+              />
+            )}
 
             {activeTab === 'rekap' && <SummaryView summary={summary} />}
 
             {activeTab === 'akun' && (
-              <AccountsView accounts={accounts} totals={totals} />
+              <AccountsView
+                accounts={accounts}
+                totals={totals}
+                onAddAccountClick={() => setIsAddAccountOpen(true)}
+                onDeleteAccount={handleDeleteAccount}
+                onResetAllData={handleResetAllData}
+              />
             )}
           </main>
         )}
@@ -116,7 +190,15 @@ export function App() {
         <BottomNavigationDock
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          onQuickAddClick={() => setIsQuickAddOpen(true)}
+          onQuickAddClick={() => {
+            if (accounts.length === 0) {
+              alert('Tambahkan minimal satu sumber dana (rekening/e-wallet) terlebih dahulu di tab Akun.');
+              setActiveTab('akun');
+              setIsAddAccountOpen(true);
+              return;
+            }
+            setIsQuickAddOpen(true);
+          }}
         />
 
         {/* Quick Add (+) Transaction Modal */}
@@ -126,6 +208,13 @@ export function App() {
           accounts={accounts}
           categories={categories}
           onSubmit={handleCreateTransaction}
+        />
+
+        {/* Add Account Modal */}
+        <AddAccountModal
+          isOpen={isAddAccountOpen}
+          onClose={() => setIsAddAccountOpen(false)}
+          onSubmit={handleCreateAccount}
         />
       </div>
     </div>

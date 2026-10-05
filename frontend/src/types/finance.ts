@@ -21,6 +21,14 @@ export interface AccountListResponse {
   totals: AccountTotals;
 }
 
+export interface CreateAccountPayload {
+  name: string;
+  type: AccountType;
+  current_balance: number;
+  credit_limit: number;
+  due_day_of_month?: number;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -68,4 +76,21 @@ export interface CreateTransactionPayload {
   type: 'EXPENSE' | 'INCOME';
   description: string;
   transaction_date: string;
+}
+
+export interface SavingsGoal {
+  id: string;
+  name: string;
+  target_amount: number;
+  current_amount: number;
+  target_date?: string;
+  icon: string;
+  created_at: string;
+}
+
+export interface CreateSavingsGoalPayload {
+  name: string;
+  target_amount: number;
+  target_date?: string;
+  icon?: string;
 }

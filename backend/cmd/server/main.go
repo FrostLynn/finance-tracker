@@ -51,11 +51,13 @@ func main() {
 	accountRepo := repository.NewPostgresAccountRepository(pool)
 	txRepo := repository.NewPostgresTransactionRepository(pool)
 	catRepo := repository.NewPostgresCategoryRepository(pool)
+	savingsRepo := repository.NewPostgresSavingsRepository(pool)
 
 	// Initialize services
 	accountSvc := service.NewAccountService(accountRepo)
 	txSvc := service.NewTransactionService(txRepo, accountRepo)
 	summarySvc := service.NewSummaryService(txRepo, accountRepo)
+	savingsSvc := service.NewSavingsService(savingsRepo)
 
 	// Initialize handlers & router
 	r := handler.NewRouter(handler.RouterDependencies{
@@ -63,6 +65,8 @@ func main() {
 		TransactionHandler: handler.NewTransactionHandler(txSvc),
 		SummaryHandler:     handler.NewSummaryHandler(summarySvc),
 		CategoryHandler:    handler.NewCategoryHandler(catRepo),
+		SavingsHandler:     handler.NewSavingsHandler(savingsSvc),
+		SystemHandler:      handler.NewSystemHandler(pool),
 	})
 
 	server := &http.Server{

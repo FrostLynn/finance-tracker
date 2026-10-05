@@ -39,7 +39,7 @@ CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions (transaction_da
 CREATE INDEX IF NOT EXISTS idx_transactions_account ON transactions (account_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions (category_id);
 
--- Seed default categories
+-- Default categories
 INSERT INTO categories (name, type, icon) VALUES
     ('Makan & Minum', 'EXPENSE', 'utensils'),
     ('Transportasi', 'EXPENSE', 'car'),
@@ -50,12 +50,4 @@ INSERT INTO categories (name, type, icon) VALUES
     ('Gaji Utama', 'INCOME', 'briefcase'),
     ('Side Project', 'INCOME', 'code'),
     ('Investasi', 'INCOME', 'trending-up')
-ON CONFLICT DO NOTHING;
-
--- Seed initial accounts
-INSERT INTO accounts (name, type, current_balance, credit_limit, due_day_of_month) VALUES
-    ('BCA Tabungan', 'BANK', 8200000, 0, NULL),
-    ('GoPay', 'EWALLET', 350000, 0, NULL),
-    ('ShopeePay', 'EWALLET', 120000, 0, NULL),
-    ('SPayLater', 'PAYLATER', -1450000, 5000000, 25)
 ON CONFLICT DO NOTHING;

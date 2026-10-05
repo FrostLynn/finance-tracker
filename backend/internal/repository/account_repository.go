@@ -12,4 +12,5 @@ type AccountRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Account, error)
 	List(ctx context.Context) ([]model.Account, error)
 	UpdateBalance(ctx context.Context, id uuid.UUID, newBalance int64) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
