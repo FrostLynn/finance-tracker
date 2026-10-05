@@ -1,5 +1,5 @@
 # Stage 1: Build binary
-FROM golang:1.23-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
@@ -21,7 +21,7 @@ ENV TZ=Asia/Jakarta
 WORKDIR /app
 COPY --from=builder /bin/server /app/server
 
-EXPOSE 8080
+EXPOSE 8085
 
 USER nobody:nobody
 
