@@ -14,12 +14,12 @@ export const BottomNavigationDock: React.FC<BottomNavigationDockProps> = ({
   onQuickAddClick,
 }) => {
   return (
-    <div className="fixed bottom-3.5 left-3.5 right-3.5 max-w-[430px] mx-auto z-40 select-none">
-      <div className="ios-glass-nav rounded-[34px] h-16 shadow-2xl grid grid-cols-[1fr_1fr_64px_1fr_1fr] items-center px-1">
+    <nav className="fixed bottom-4 left-3.5 right-3.5 max-w-[430px] mx-auto z-40 select-none">
+      <div className="ios-glass-nav rounded-[28px] h-16 shadow-2xl grid grid-cols-[1fr_1fr_64px_1fr_1fr] items-center px-1">
         {/* Tab 1: Mutasi */}
         <button
           onClick={() => onTabChange('mutasi')}
-          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 ${
+          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 cursor-pointer ${
             activeTab === 'mutasi' ? 'text-ios-blue font-semibold' : 'text-ios-secondary hover:text-white'
           }`}
           aria-label="Tab Mutasi"
@@ -31,7 +31,7 @@ export const BottomNavigationDock: React.FC<BottomNavigationDockProps> = ({
         {/* Tab 2: Budget */}
         <button
           onClick={() => onTabChange('budget')}
-          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 ${
+          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 cursor-pointer ${
             activeTab === 'budget' ? 'text-ios-blue font-semibold' : 'text-ios-secondary hover:text-white'
           }`}
           aria-label="Tab Budget"
@@ -54,7 +54,7 @@ export const BottomNavigationDock: React.FC<BottomNavigationDockProps> = ({
         {/* Tab 3: Rekap */}
         <button
           onClick={() => onTabChange('rekap')}
-          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 ${
+          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 cursor-pointer ${
             activeTab === 'rekap' ? 'text-ios-blue font-semibold' : 'text-ios-secondary hover:text-white'
           }`}
           aria-label="Tab Rekap"
@@ -66,7 +66,7 @@ export const BottomNavigationDock: React.FC<BottomNavigationDockProps> = ({
         {/* Tab 4: Akun */}
         <button
           onClick={() => onTabChange('akun')}
-          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 ${
+          className={`flex flex-col items-center justify-center gap-0.5 h-full transition-colors active:scale-95 cursor-pointer ${
             activeTab === 'akun' ? 'text-ios-blue font-semibold' : 'text-ios-secondary hover:text-white'
           }`}
           aria-label="Tab Akun"
@@ -75,11 +75,6 @@ export const BottomNavigationDock: React.FC<BottomNavigationDockProps> = ({
           <span className="text-[10px]">Akun</span>
         </button>
       </div>
-
-      {/* iOS Home Indicator Bar */}
-      <div className="flex justify-center mt-2">
-        <div className="w-32 h-1 bg-white/20 rounded-full" />
-      </div>
-    </div>
+    </nav>
   );
 };
